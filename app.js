@@ -1,10 +1,18 @@
 'use strict'
 const express = require('express')
 const os = require('os')
-const HOSTNAME = '0.0.0.0'
-const PORT = process.env.SERVICE_PORT || 8080
+
+const SERVICE_HOSTNAME = '0.0.0.0'
+const SERVICE_PORT = process.env.SERVICE_PORT || 8080
 const SERVICE_NAME = process.env.SERVICE_NAME || 'generic-http-server'
 const SERVICE_VERSION = process.env.SERVICE_VERSION || '0.1.0'
+const API_GET_PATHS = process.env.API_GET_PATHS || '/hello;/hi'
+
+console.log(`[INFO_] SERVICE_HOSTNAME: ${SERVICE_HOSTNAME}`)
+console.log(`[INFO_] SERVICE_PORT: ${SERVICE_PORT}`)
+console.log(`[INFO_] SERVICE_NAME: ${SERVICE_NAME}`)
+console.log(`[INFO_] SERVICE_VERSION: ${SERVICE_VERSION}`)
+console.log(`[INFO_] API_GET_PATHS: ${API_GET_PATHS}`)
 
 const app = express()
 
@@ -13,8 +21,7 @@ app.use((req, res, next) => {
   next()
 })
 
-const endpoints = process.env.ENDPOINTS || '/hello'
-endpoints.split(';').forEach(path => {
+API_GET_PATHS.split(';').forEach(path => {
   if (!path.startsWith('/')) {
     console.log(`[ERROR] The path '${path}' does not start with '/'.`)
   } else {
@@ -22,22 +29,21 @@ endpoints.split(';').forEach(path => {
     app.get(path, (req, res) => {
       res.json({
         message: `Hello from GET ${path}`,
-        internalInfo: {
+        debug: {
           serviceName: SERVICE_NAME,
-          version: SERVICE_VERSION,
+          serviceVersion: SERVICE_VERSION,
           path: path,
           hostname: {
-            configured: HOSTNAME,
+            configured: SERVICE_HOSTNAME,
             fromOS: os.hostname()
           },
-          port: PORT,
+          port: SERVICE_PORT,
           headers: req.headers
         }
       })
       console.log(`[INFO_] ${req.ip} | 200`)
     })
   }
-  
 })
 
 // NOT FOUND
@@ -45,9 +51,19 @@ app.use((req, res) => {
   console.log(`[ERROR] ${req.ip} | 404 | ${SERVICE_NAME} (${SERVICE_VERSION}) does NOT implement ${req.method} ${req.url}`)
   res.status(404).json({
     errorcode: 404,
-    errorMessage: `[ERROR] ${SERVICE_NAME} (${SERVICE_VERSION}) does NOT implement ${req.method} ${req.url}`
+    errorMessage: `${SERVICE_NAME} (${SERVICE_VERSION}) does NOT implement ${req.method} ${req.url}`,
+    debug: {
+      serviceName: SERVICE_NAME,
+      serviceVersion: SERVICE_VERSION,
+      hostname: {
+        configured: SERVICE_HOSTNAME,
+        fromOS: os.hostname()
+      },
+      port: SERVICE_PORT,
+      headers: req.headers
+    }
   })
 })
 
-app.listen(PORT, HOSTNAME)
-console.log(`Running on http://${HOSTNAME}:${PORT}`);
+app.listen(SERVICE_PORT, SERVICE_HOSTNAME)
+console.log(`[INFO_] Running on http://${SERVICE_HOSTNAME}:${SERVICE_PORT}`);
