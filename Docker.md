@@ -4,7 +4,7 @@ $ docker --version
 Docker version 19.03.12, build 48a66213fe
 $ docker build --tag patrice1972/generic-http-server:0.1.0 .
 ...
-Successfully built 9e1186ab5e80
+Successfully built 7e3338105a41
 Successfully tagged patrice1972/generic-http-server:0.1.0
 $ docker images
 REPOSITORY                                        TAG                 IMAGE ID            CREATED             SIZE
@@ -27,5 +27,5 @@ $ docker login
 Login Succeeded
 $ docker push patrice1972/generic-http-server:0.1.0
 ...
-0.1.0: digest: sha256:19329b2de1620392cd834872e54ee77fabed188e2705ef89dc3a56196392d36d size: 2202
+0.1.0: digest: sha256:997bae8c7caaba794717121c4137da0dddb327a9fb1bdaa4d6cdd6ba5bd3f64d size: 2202
 ```
